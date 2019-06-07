@@ -2,11 +2,31 @@ import React from 'react';
 import { StyleSheet, Text, View } from 'react-native';
 
 import Status from './components/Status'
+import MessageList from './components/MessageList';
+import { createImageMessage, createLocationMessage, createTextMessage } from './utils/MessageUtils';
 
 export default class App extends React.Component {
+  state = {
+    messages: [
+      createImageMessage('http://unsplash.it/300/300'),
+      createTextMessage('Kpose'),
+      createTextMessage('lorem ispium'),
+      createLocationMessage({
+        latitude: 37.78825,
+        longitude: -122.4324,
+      }),
+    ],
+  };
+
+  handlePressMessage = () => {}
+
+
   renderMessageList() {
+    const { messages } = this.state;
     return (
-      <View style = {styles.content}></View>
+      <View style = {styles.content}>
+        <MessageList messages ={messages} onPress={this.handlePressMessage} />
+      </View>
     );
   }
 
