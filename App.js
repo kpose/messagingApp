@@ -1,5 +1,5 @@
 import React from 'react';
-import { StyleSheet, Text, View } from 'react-native';
+import { StyleSheet, Text, View, Alert } from 'react-native';
 
 import Status from './components/Status'
 import MessageList from './components/MessageList';
@@ -18,7 +18,33 @@ export default class App extends React.Component {
     ],
   };
 
-  handlePressMessage = () => {}
+  handlePressMessage = ({id, type }) => {
+    switch (type) {
+      case 'text':
+        Alert.alert(
+          'Delete Message?',
+          'Are you sure you want to parmanently delete this message',
+          [
+            {
+              text: 'Cancel',
+              style: 'cancel',
+            },
+            {
+              text: 'Delete',
+              style: 'destructive',
+              onPress()=> {
+                const{ message } =this.state;
+                this.setState({messages: messages.filter(message => message.id !==id)
+                });
+              },
+            },
+          ],
+        ),
+        break;
+        default:
+        break;
+    }
+  };
 
 
   renderMessageList() {
