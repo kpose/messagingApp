@@ -1,5 +1,5 @@
 import React from 'react';
-import { StyleSheet, Text, View, Alert } from 'react-native';
+import { StyleSheet, Text, View, Alert, Image, TouchableHighlight, BackHandler, } from 'react-native';
 
 import Status from './components/Status'
 import MessageList from './components/MessageList';
@@ -16,6 +16,53 @@ export default class App extends React.Component {
         longitude: -122.4324,
       }),
     ],
+    fullscreenImageId: null,
+  };
+
+  componentWillMount() {
+    this.subscription = BackHandler.addEventListener(
+      'hardwareBackPress',
+      () => {
+        const { fullscreenImageId } = this.state;
+
+        if (fullscreenImageId) {
+          this.dismissFullscreenImage();
+          return true;
+        }
+
+        return false;
+      },
+    );
+  }
+
+  componentWillUnmount() {
+    this.subscription.remove();
+  }
+
+
+  dismissFullscreenImage = () => {
+    this.setState({ fullscreenImageId: null});
+  };
+
+  renderFullscreenImage = () => {
+    const { messages, fullscreenImageId } = this.state;
+
+    if (!fullscreenImageId) return null;
+
+    const image = messages.find(message => message.id === fullscreenImageId);
+
+    if (!image) return null;
+
+    const { uri } = image;
+
+    return (
+      <TouchableHighlight
+        style={styles.fullscreenOverlay}
+        onPress={this.dismissFullscreenImage}
+      >
+        <Image style={styles.fullscreenImage} source={{ uri }} />
+      </TouchableHighlight>
+    );
   };
 
   handlePressMessage = ({id, type }) => {
@@ -23,7 +70,7 @@ export default class App extends React.Component {
       case 'text':
         Alert.alert(
           'Delete Message?',
-          'Are you sure you want to parmanently delete this message',
+          'Are you sure you want to parmanently delete this message?',
           [
             {
               text: 'Cancel',
@@ -39,7 +86,10 @@ export default class App extends React.Component {
               },
             },
           ],
-        ),
+        );
+        break;
+        case 'image':
+        this.setState({ fullscreenImageId: id});
         break;
         default:
         break;
@@ -71,9 +121,11 @@ export default class App extends React.Component {
   render() {
     return(
       <View style = {styles.container}>
+      <Status />
         {this.renderMessageList()}
         {this.renderToolbar()}
         {this.renderInputMethodEditor()}
+        {this.renderFullscreenImage()}
       </View>
     );
   }
@@ -96,5 +148,14 @@ const styles = StyleSheet.create({
     borderTopWidth: 1,
     borderTopColor: 'rgba(0,0,0,0.04)',
     backgroundColor : 'white',
+  },
+  fullscreenOverlay: {
+    ...StyleSheet.absoluteFillObject,
+    backgroundColor: 'black',
+    zIndex: 2,
+    },
+  fullscreenImage: {
+    flex: 1,
+    resizeMode: 'contain',
   },
 });
