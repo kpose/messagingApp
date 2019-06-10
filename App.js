@@ -79,7 +79,7 @@ export default class App extends React.Component {
             {
               text: 'Delete',
               style: 'destructive',
-              onPress()=> {
+              onPress: () => {
                 const{ message } =this.state;
                 this.setState({messages: messages.filter(message => message.id !==id)
                 });
