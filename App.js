@@ -17,7 +17,9 @@ export default class App extends React.Component {
       }),
     ],
     fullscreenImageId: null,
+    isInputFocused: false,
   };
+
 
   componentWillMount() {
     this.subscription = BackHandler.addEventListener(
@@ -43,6 +45,27 @@ export default class App extends React.Component {
   dismissFullscreenImage = () => {
     this.setState({ fullscreenImageId: null});
   };
+
+  handlePressToolbarCamera= () => {
+    //
+  }
+
+  handlePressToolbarLocation = () => {
+    //
+  }
+
+  handleChangeFocus = (isFocused) => {
+    this.setState({ isInputFocused : isFocused});
+  };
+
+  handleSubmit = (text) => {
+    const { messages } = this.state;
+
+    this.setState({
+      messages: [createTextMessage(text), ...messages],
+    });
+  };
+
 
   renderFullscreenImage = () => {
     const { messages, fullscreenImageId } = this.state;
@@ -106,17 +129,30 @@ export default class App extends React.Component {
     );
   }
 
+
+  renderToolbar() {
+    const { isInputFocused } = this.state;
+
+    return (
+      <View style={styles.toolbar}>
+        <Toolbar
+          isFocused={isInputFocused}
+          onSubmit={this.handleSubmit}
+          onChangeFocus={this.handleChangeFocus}
+          onPressCamera={this.handlePressToolbarCamera}
+          onPressLocation={this.handlePressToolbarLocation}
+        />
+      </View>
+    );
+  }
+
+  
   renderInputMethodEditor() {
     return (
       <View style = {styles.inputMethodEditor}></View>
     );
   }
 
-  renderToolbar() {
-    return(
-      <View style = {styles.toolbar}></View>
-    );
-  }
 
   render() {
     return(
