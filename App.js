@@ -2,6 +2,7 @@ import React from 'react';
 import { StyleSheet, Text, View, Alert, Image, TouchableHighlight, BackHandler, } from 'react-native';
 
 import Status from './components/Status'
+import Toolbar from './components/Toolbar';
 import MessageList from './components/MessageList';
 import { createImageMessage, createLocationMessage, createTextMessage } from './utils/MessageUtils';
 
@@ -51,8 +52,22 @@ export default class App extends React.Component {
   }
 
   handlePressToolbarLocation = () => {
-    //
-  }
+    const { messages } = this.state;
+
+    navigator.geolocation.getCurrentPosition(position => {
+      const { coords: { latitude, longitude } } = position;
+
+      this.setState({
+        messages: [
+          createLocationMessage({
+            latitude,
+            longitude,
+          }),
+          ...messages,
+        ],
+      });
+    });
+  };
 
   handleChangeFocus = (isFocused) => {
     this.setState({ isInputFocused : isFocused});
@@ -88,12 +103,12 @@ export default class App extends React.Component {
     );
   };
 
-  handlePressMessage = ({id, type }) => {
+  handlePressMessage = ({ id, type }) => {
     switch (type) {
       case 'text':
         Alert.alert(
-          'Delete Message?',
-          'Are you sure you want to parmanently delete this message?',
+          'Delete message?',
+          'Are you sure you want to permanently delete this message?',
           [
             {
               text: 'Cancel',
@@ -103,18 +118,19 @@ export default class App extends React.Component {
               text: 'Delete',
               style: 'destructive',
               onPress: () => {
-                const{ message } =this.state;
-                this.setState({messages: messages.filter(message => message.id !==id)
+                const { messages } = this.state;
+                this.setState({
+                  messages: messages.filter(message => message.id !== id),
                 });
               },
             },
           ],
         );
         break;
-        case 'image':
-        this.setState({ fullscreenImageId: id});
+      case 'image':
+        this.setState({ fullscreenImageId: id, isInputFocused: false });
         break;
-        default:
+      default:
         break;
     }
   };
